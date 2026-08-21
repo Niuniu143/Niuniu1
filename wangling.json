@@ -1,0 +1,380 @@
+-- [NEW CODE: Utility functions for time-based expiration]
+
+-- Helper function to convert 'YYYY-MM-DD HH:MM:SS' string to a Unix timestamp
+function dateToTimestamp(date_str)
+  local year, month, day, hour, minute, second = date_str:match("(%d+)-(%d+)-(%d+) (%d+):(%d+):(%d+)")
+  if not (year and month and day and hour and minute and second) then
+    -- Fallback/Error handling for old YYYY-MM-DD format, assuming midnight expiration
+    year, month, day = date_str:match("(%d+)-(%d+)-(%d+)")
+    if year then
+      return os.time({year=tonumber(year), month=tonumber(month), day=tonumber(day), hour=0, min=0, sec=0})
+    end
+    return nil -- Cannot parse date
+  end
+  return os.time({year=tonumber(year), month=tonumber(month), day=tonumber(day), hour=tonumber(hour), min=tonumber(minute), sec=tonumber(second)})
+end
+
+-- Calculates and formats the remaining time into a readable string
+function getRemainingTime(expiration_date_str)
+  local expiration_ts = dateToTimestamp(expiration_date_str)
+  if not expiration_ts then return "Error: Invalid Date", "Error" end
+
+  local current_ts = os.time()
+  local remaining_seconds = math.max(0, os.difftime(expiration_ts, current_ts))
+
+  if remaining_seconds <= 0 then
+    return nil, "Expired"
+  end
+
+  local days = math.floor(remaining_seconds / (60 * 60 * 24))
+  remaining_seconds = remaining_seconds % (60 * 60 * 24)
+  local hours = math.floor(remaining_seconds / (60 * 60))
+  remaining_seconds = remaining_seconds % (60 * 60)
+  local minutes = math.floor(remaining_seconds / 60)
+  local seconds = math.floor(remaining_seconds % 60)
+
+  local time_parts = {}
+  if days > 0 then table.insert(time_parts, days .. " days") end
+  if hours > 0 then table.insert(time_parts, hours .. " hours") end
+  if minutes > 0 then table.insert(time_parts, minutes .. " mins") end
+  table.insert(time_parts, seconds .. " secs")
+
+  return table.concat(time_parts, ", "), "Active"
+end
+
+-- Checks if the license is expired (now time-based)
+function isExpired(expiration_date_str)
+  local expiration_ts = dateToTimestamp(expiration_date_str)
+  if not expiration_ts then return true end -- Default to expired if date is unreadable
+  local current_ts = os.time()
+  return current_ts >= expiration_ts
+end
+
+-- Updated keys with time (assuming midnight expiration for previous dates)
+local keys = {
+  {key = "Axion", expiration_date = "2026-12-08 23:59:59"}, -- Updated format: YYYY-MM-DD HH:MM:SS
+  {key = "Kaz2", expiration_date = "2025-11-23 00:00:00"},
+  {key = "Kazzue2", expiration_date = "2025-11-23 00:00:00"},
+}
+
+function isValidKey(user_key)
+  for _, key_data in ipairs(keys) do
+    if user_key == key_data.key then
+      if isExpired(key_data.expiration_date) then
+        return false, "ᴛʜᴇ ʟɪᴄᴇɴꜱᴇ ʜᴀꜱ ᴇxᴘɪʀᴇᴅ ᴏɴ " .. formatExpirationDate(key_data.expiration_date)
+       else
+        local remaining_time, _ = getRemainingTime(key_data.expiration_date)
+        return true, "ᴀᴄᴄᴇꜱꜱ ɢʀᴀɴᴛᴇᴅ! ʀᴇᴍᴀɪɴɪɴɢ ᴛɪᴍᴇ: " .. remaining_time
+      end
+    end
+  end
+  return false, "ɪɴᴠᴀʟɪᴅ ʟɪᴄᴇɴꜱᴇ ᴛʀʏ ᴀɢᴀɪɴ."
+end
+
+-- Formats the full expiration date and time
+function formatExpirationDate(expiration_date_str)
+  local year, month, day, hour, minute, second = expiration_date_str:match("(%d+)-(%d+)-(%d+) (%d+):(%d+):(%d+)")
+  if not year then
+    -- Fallback for YYYY-MM-DD format
+    year, month, day = expiration_date_str:match("(%d+)-(%d+)-(%d+)")
+    if year then
+      hour, minute, second = "00", "00", "00"
+     else
+      return expiration_date_str -- Return unformatted if unparsable
+    end
+  end
+  local month_names = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
+  local formatted_time = string.format("%02d:%02d:%02d", tonumber(hour), tonumber(minute), tonumber(second))
+  return month_names[tonumber(month)] .. " " .. day .. ", " .. year .. " at " .. formatted_time
+end
+
+function showKeyDialog()
+  local dialog = Dialog(activity)
+  dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+  dialog.setCancelable(false)
+  dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+  dialog.getWindow().setBackgroundDrawableResource(android.R.color.white)
+
+  local layout = LinearLayout(activity)
+  layout.setOrientation(LinearLayout.VERTICAL)
+  layout.setPadding(60, 60, 60, 60)
+  layout.setBackgroundColor(Color.parseColor("#FFFFFF"))
+  layout.setLayoutParams(ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+
+  local titleText = TextView(activity)
+  titleText.setText("ʟɪᴄᴇɴꜱᴇ ᴠᴇʀɪꜰɪᴄᴀᴛɪᴏɴ ")
+  titleText.setTextColor(Color.parseColor("#000000"))
+  titleText.setTextSize(24)
+  titleText.setGravity(1)
+
+  local messageText = TextView(activity)
+  messageText.setText("ᴘᴜᴛ ʏᴏᴜʀ ʟɪᴄᴇɴꜱᴇ ɢɪᴠᴇɴ ʙʏ ʀᴇꜱᴇʟʟᴇʀ/ᴏᴡɴᴇʀ:")
+  messageText.setTextColor(Color.parseColor("#3333FF"))
+  messageText.setTextSize(18)
+  messageText.setGravity(1)
+
+  local input = EditText(activity)
+  input.setHint("ᴇɴᴛᴇʀ ᴛʜᴇ ʟɪᴄᴇɴꜱᴇ")
+  input.setTextSize(16)
+  input.setPadding(20, 20, 20, 20)
+  input.setLayoutParams(ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+
+  local buttonLayout = LinearLayout(activity)
+  buttonLayout.setOrientation(LinearLayout.HORIZONTAL)
+  buttonLayout.setPadding(0, 40, 0, 0)
+  buttonLayout.setGravity(1)
+
+  local okButton = TextView(activity)
+  okButton.setText("ʟᴏɢɪɴ")
+  okButton.setTextSize(15)
+  okButton.setTextColor(Color.WHITE)
+  okButton.setBackgroundColor(Color.parseColor("#000000"))
+  okButton.setPadding(30, 20, 30, 20)
+  okButton.setGravity(1)
+  okButton.setOnClickListener(function()
+    local user_key = tostring(input.getText())
+    local valid, message = isValidKey(user_key)
+    if valid then
+      -- The message from isValidKey now includes the remaining time
+      Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
+      for _, key_data in ipairs(keys) do
+        if user_key == key_data.key and not isExpired(key_data.expiration_date) then
+          local remaining_time, _ = getRemainingTime(key_data.expiration_date)
+          -- Updated toast to show remaining time.
+          Toast.makeText(activity, "ʏᴏᴜʀ ʟɪᴄᴇɴꜱᴇ ᴇxᴘɪʀᴇꜱ ɪɴ " .. remaining_time, Toast.LENGTH_LONG).show()
+          dialog.dismiss()
+          -- Start the continuous timer on the main screen
+          startContinuousTimer(key_data.expiration_date)
+          return
+        end
+      end
+     else
+      Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
+    end
+  end)
+
+  local checkChannelButton = TextView(activity)
+  checkChannelButton.setText("ʙᴜʏ ʟɪᴄᴇɴꜱᴇ")
+  checkChannelButton.setTextSize(15)
+  checkChannelButton.setTextColor(Color.WHITE)
+  checkChannelButton.setBackgroundColor(Color.parseColor("#000000"))
+  checkChannelButton.setPadding(30, 20, 30, 20)
+  checkChannelButton.setGravity(1)
+  checkChannelButton.setOnClickListener(function()
+    intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/prettylittlebabygirl64"))
+    activity.startActivity(intent)
+  end)
+
+  local exitButton = TextView(activity)
+  exitButton.setText("ᴇxɪᴛ")
+  exitButton.setTextSize(15)
+  exitButton.setTextColor(Color.WHITE)
+  exitButton.setBackgroundColor(Color.parseColor("#000000"))
+  exitButton.setPadding(30, 20, 30, 20)
+  exitButton.setGravity(1)
+  exitButton.setOnClickListener(function()
+    activity.finish()
+  end)
+
+  buttonLayout.addView(okButton)
+  buttonLayout.addView(checkChannelButton)
+  buttonLayout.addView(exitButton)
+
+  layout.addView(titleText)
+  layout.addView(messageText)
+  layout.addView(input)
+  layout.addView(buttonLayout)
+
+  dialog.setContentView(layout)
+  dialog.show()
+end
+
+showKeyDialog()
+
+-- [NEW CODE: Continuous Timer Function]
+
+-- Global variable to hold the timer thread
+local expiration_timer_thread = nil
+
+-- Function to start a continuous timer on a TextView
+function startContinuousTimer(expiration_date_str)
+  local expiration_ts = dateToTimestamp(expiration_date_str)
+  if not expiration_ts then return end
+
+  -- Stop any existing timer
+  if expiration_timer_thread then
+    expiration_timer_thread:stop()
+  end
+
+  -- IMPORTANT: This timer relies on the 'timerDisplay' TextView added to 'layout.aly'.
+  if timerDisplay == nil then
+    print("Warning: timerDisplay TextView not found. Timer will not be visible.")
+    return
+  end
+
+  expiration_timer_thread = timer(1000, function(t) -- Updates every 1000ms (1 second)
+    local remaining_time, status = getRemainingTime(expiration_date_str)
+
+    activity.runOnUiThread(function()
+      if status == "Expired" then
+        t:stop()
+        timerDisplay.setText("LICENSE EXPIRED")
+        timerDisplay.setTextColor(0xFFFF0000) -- Red color for expired
+        -- os.exit() -- Uncomment to exit when expired
+        return
+      end
+
+      timerDisplay.setText("Expires in: " .. remaining_time)
+      -- Optional: Change color based on urgency (e.g., less than 24 hours)
+      -- if math.difftime(expiration_ts, os.time()) < 86400 then
+      --   timerDisplay.setTextColor(0xFFFFC300) -- Yellow
+      --  else
+      --   timerDisplay.setTextColor(0xFFFFFFFF) -- White
+      -- end
+    end)
+  end)
+end
+{
+  "systems": [
+    {      
+      "name": "CALL OF DUTY",
+      "status": "ONLINE",
+      "game_activity": "com.tencent.tmgp.cod.CODMainActivity",
+      "logo": "https://raw.githubusercontent.com/IMMORTALKING143/Niuniu/refs/heads/main/Call%20Of%20Duty%20Mobile%20Wallpaper%20(1).jpg",
+      "libs": [
+        {
+          "name": "IMMORTAL KING MOD WITH SKIN",
+          "lib_name": "lib1.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/lib1.so"
+        },
+        { 
+          "name": "GHOST ECLIPSE",
+          "lib_name": "lib2.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/lib2.so"
+          },
+        {
+          "name": "VVIP MODS",
+          "lib_name": "lib3.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/lib3.so"
+          },
+        {
+          "name": "NOVARA MOD FILES",
+          "lib_name": "libAhook.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/libAhook.so"
+          },
+        {
+          "name": "NOVARA MOD",
+          "lib_name": "lib4.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/lib4.so"
+          },
+        {
+          "name": "VEINHAX HELIOS",
+          "lib_name": "lib5.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/lib5.so"
+          },
+        {
+          "name": "GABIMARU MOD",
+          "lib_name": "lib6.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/lib6.so"
+           },
+        {
+          "name": "SHONE NEW MOD",
+          "lib_name": "lib7.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/lib7.so"          
+          },
+        {
+          "name": "SWAG MOD FILES",
+          "lib_name": "libAhook.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/libAhook.so"
+          },
+        {
+          "name": "SWAG MOD",
+          "lib_name": "lib8.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/lib8.so"
+          },
+        {
+          "name": "HEXABYTEZ FREE VERSION",
+          "lib_name": "lib9.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/lib9.so"
+          },
+        {
+          "name": "GHOST VIP MOD V2",
+          "lib_name": "lib10.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/lib10.so"
+          },
+        { 
+          "name": "KAEL FREE MOD",
+          "lib_name": "lib11.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/lib11.so"          
+          },
+        { 
+          "name": "XINN AUTO UPDATE BYPASS",
+          "lib_name": "libXINNMOD.so",
+          "download_url": "https://oobakit.strangled.net/OnlineLibJustine/libXINNMOD.so"
+          },
+        {
+          "name": "JAREDAX MOD",
+          "lib_name": "lib13.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/lib13.so"
+          },
+        {
+          "name": "DCIB X 4AM MOD",
+          "lib_name": "lib14.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/lib14.so"          
+          },
+        {
+          "name": "KYZ VVIP",
+          "lib_name": "lib15.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/lib15.so"
+          },
+        {
+          "name": "ZENITRIX MOD",
+          "lib_name": "lib16.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/lib16.so"
+          },
+        { 
+          "name": "SHISUI FREE MOD",
+          "lib_name": "lib17.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/lib17.so"
+          },
+        { 
+          "name": "LUMINANCE V2",
+          "lib_name": "lib18.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/lib18.so"
+          },
+        { 
+          "name": "VOID FREE VIP",
+          "lib_name": "lib19.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/lib19.so"
+          },
+        { 
+          "name": "ASHTEVS V2",
+          "lib_name": "lib20.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/lib20.so"
+          },
+        { 
+          "name": "ZENXVELD MOD",
+          "lib_name": "lib21.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/lib21.so"
+          },
+        { 
+          "name": "OWL HAX ",
+          "lib_name": "lib22.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/lib22.so"
+          },
+        { 
+          "name": "VOLTEX DELUXE WITH PREMIUM FEATURES",
+          "lib_name": "lib23.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/lib23.so"
+          },
+        { 
+          "name": "EPICZSX MOD",
+          "lib_name": "lib24.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu/raw/refs/heads/main/lib24.so"
+        }
+      ]
+    }
+  ],
+  "music": ""
+}
+
