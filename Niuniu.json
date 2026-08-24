@@ -23,14 +23,7 @@
       "game_activity": "com.tencent.tmgp.cod.CODMainActivity"
     },
     {
-      "name": "NOVARA MOD FILES",
-      "status": "ONLINE",
-      "lib_name": "libAhook.so",
-      "download_url": "https://github.com/Niuniu143/Niuniu1/raw/refs/heads/main/libAhook.so",
-      "game_activity": "com.tencent.tmgp.cod.CODMainActivity"
-    },
-    {
-      "name": "NOVARA MOD",
+      "name": "NPC MOD",
       "status": "ONLINE",
       "lib_name": "lib4.so",
       "download_url": "https://github.com/Niuniu143/Niuniu1/raw/refs/heads/main/lib4.so",
