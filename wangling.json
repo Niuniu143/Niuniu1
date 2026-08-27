@@ -22,12 +22,7 @@
           "download_url": "https://github.com/Niuniu143/Niuniu1/raw/refs/heads/main/lib3.so"
           },
         {
-          "name": "NOVARA MOD FILES",
-          "lib_name": "libAhook.so",
-          "download_url": "https://github.com/Niuniu143/Niuniu1/raw/refs/heads/main/libAhook.so"
-          },
-        {
-          "name": "NOVARA MOD",
+          "name": "NPC MOD",
           "lib_name": "lib4.so",
           "download_url": "https://github.com/Niuniu143/Niuniu1/raw/refs/heads/main/lib4.so"
           },
@@ -62,7 +57,7 @@
           "download_url": "https://github.com/Niuniu143/Niuniu1/raw/refs/heads/main/lib9.so"
           },
         {
-          "name": "GHOST VIP MOD V2",
+          "name": "NOCTURNE INTERNAL V5",
           "lib_name": "lib10.so",
           "download_url": "https://github.com/Niuniu143/Niuniu1/raw/refs/heads/main/lib10.so"
           },
@@ -92,9 +87,9 @@
           "download_url": "https://github.com/Niuniu143/Niuniu1/raw/refs/heads/main/lib15.so"
           },
         {
-          "name": "ZENITRIX MOD",
+          "name": "FKER MOD",
           "lib_name": "lib16.so",
-          "download_url": "https://github.com/Niuniu143/Niuniu1/raw/refs/heads/main/lib16.so"
+          "download_url": "https://panel.fker.pro/onlinelib/oh3x/libv++.so"
           },
         { 
           "name": "SHISUI FREE MOD",
