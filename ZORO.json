@@ -8,8 +8,8 @@
       "libs": [
         {
           "name": "Zoromod v7",
-          "lib_name": "libfec.so",
-          "download_url": "https://newcharleshaxx-panels.x10.mx/Paul/Farlight/libfec.so"
+          "lib_name": "libZorov7.so",
+          "download_url": "https://github.com/Niuniu143/Niuniu1/raw/refs/heads/main/libZorov7.so"
         }
       ]
     }
