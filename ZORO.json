@@ -8,7 +8,7 @@
       "libs": [
         {
           "name": "Zoromod v7",
-          "lib_name": "libfec.so,
+          "lib_name": "libfec.so",
           "download_url": "https://newcharleshaxx-panels.x10.mx/Paul/Farlight/libfec.so"
         }
       ]
