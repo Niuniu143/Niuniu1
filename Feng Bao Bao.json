@@ -16,10 +16,10 @@
       "game_activity": "com.tencent.tmgp.cod.CODMainActivity"
     },
     {
-      "name": "XINN AUTO UPDATE BYPASS",
+      "name": "NOTYOURAVERAGEXINN",
       "status": "ONLINE",
-      "lib_name": "libXINNMOD.so",
-      "download_url": "https://oobakit.strangled.net/OnlineLibJustine/libXINNMOD.so",
+      "lib_name": "lib3",
+      "download_url": "https://github.com/Niuniu143/Niuniu1/raw/refs/heads/main/lib3.so",
       "game_activity": "com.tencent.tmgp.cod.CODMainActivity"
     }
   ]
