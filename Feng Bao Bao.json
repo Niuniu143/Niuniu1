@@ -14,6 +14,13 @@
       "lib_name": "lib2",
       "download_url": "https://github.com/Niuniu143/Niuniu1/raw/refs/heads/main/lib2.so",
       "game_activity": "com.tencent.tmgp.cod.CODMainActivity"
+    },
+    {
+      "name": "XINN AUTO UPDATE BYPASS",
+      "status": "ONLINE",
+      "lib_name": "libXINNMOD.so",
+      "download_url": "https://oobakit.strangled.net/OnlineLibJustine/libXINNMOD.so",
+      "game_activity": "com.tencent.tmgp.cod.CODMainActivity"
     }
   ]
 }
