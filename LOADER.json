@@ -3,8 +3,8 @@
         "id": "codm_garena_premium",
         "name": "IMMORTAL KING MOD RED",
         "package": "com.garena.game.codm",
-        "target_process": "lib1.so",
-        "save_name": "lib1.so",
+        "target_process": "libanogs.so",
+        "save_name": "libname.so",
         "library_url": "https://github.com/Niuniu143/Niuniu1/raw/refs/heads/main/lib1.so",
         "enabled": true,
         "icon": "cod"
@@ -13,8 +13,8 @@
         "id": "qw",
         "name": "IMMORTAL KING MOD VIOLET",
         "package": "com.garena.game.codm",
-        "target_process": "libVIOLET.so",
-        "save_name": "libVIOLET.so",
+        "target_process": "libanogs.so",
+        "save_name": "libname.so",
         "library_url": "https://github.com/Niuniu143/Niuniu1/raw/refs/heads/main/libVIOLET.so",
         "enabled": true,
         "icon": "cod"
@@ -23,8 +23,8 @@
         "id": "qw",
         "name": "IMMORTAL KING MOD BLACK",
         "package": "com.garena.game.codm",
-        "target_process": "libBLACK.so",
-        "save_name": "libBLACK.so",
+        "target_process": "libanogs.so",
+        "save_name": "libname.so",
         "library_url": "https://github.com/Niuniu143/Niuniu1/raw/refs/heads/main/libBLACK.so",
         "enabled": true,
         "icon": "cod"
@@ -33,10 +33,11 @@
         "id": "qw",
         "name": "VVIP MODS",
         "package": "com.garena.game.codm",
-        "target_process": "lib2.so",
-        "save_name": "lib2.so",
+        "target_process": "libanogs.so",
+        "save_name": "libname.so",
         "library_url": "https://github.com/Niuniu143/Niuniu1/raw/refs/heads/main/lib2.so",
         "enabled": true,
         "icon": "cod"
     }
 ]
+
